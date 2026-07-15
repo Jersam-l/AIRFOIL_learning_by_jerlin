@@ -1,14 +1,24 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-c=1.0 #chord length
-n=1000 #number of points
+airfoil=(input("Enter the 4 digits of the NACA series whose coordinates were needed :"))
+if len(airfoil)!=4:
+	print("Bruh this is for 4 digit airfoil enter 4 digits only  this is an error .")
+	exit()
+elif len(airfoil)<4:
+	print("Bruh this is for 4 digit airfoil enter 4 digits only  this is an error .")
+	exit()
 
+chord=(input("Enter the required chord length :"))
+points=(input("Enter the  number of point's needed for the coordinates (whole number) :"))
+
+c=float(chord) #chord length
+n=int(points) #number of points
 # x coordinate
 x=np.linspace(0,c,n)
-m=0.02   #chamber
-p=0.4    #position of the chamber
-t=0.12  #thickness
+m=int(airfoil[0])/100   #chamber
+p=int(airfoil[1])/10    #position of the chamber
+t=int((airfoil[2:]))/10  #thickness
 
 xu=np.zeros(n)
 yu=np.zeros(n)
