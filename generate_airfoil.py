@@ -34,12 +34,10 @@ yu=yc+yt*np.cos(theta)
 xl=x+yt*np.sin(theta)
 yl=yc-yt*np.cos(theta)
 
-plt.figure(figsize=(10,4))
-plt.plot(xu,yu,label="upper surface")
-plt.plot(xl,yl,label="lower layer")
-plt.plot(x,yc,"--",label="chamber line")
-plt.grid(True)
-plt.axis('equal')
-plt.legend()
-plt.show()	
+boundary_x=np.concatenate((xu[::-1],xl[1:]))
+boundary_y=np.concatenate((yu[::-1],yl[1:]))
 
+filename=f"NACA{int(m*100)}{int(p*10)}{int(t*100):02d}.dat"
+with open(filename,"w") as file:
+	for i in range(len(boundary_x)):
+		file.write(f"{boundary_x[i]:.8f} {boundary_y[i]:.8f}\n")
