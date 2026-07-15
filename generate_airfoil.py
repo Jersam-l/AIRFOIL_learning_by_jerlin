@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 airfoil=(input("Enter the 4 digits of the NACA series whose coordinates were needed :"))
 if len(airfoil)!=4:
@@ -18,7 +18,7 @@ n=int(points) #number of points
 x=np.linspace(0,c,n)
 m=int(airfoil[0])/100   #chamber
 p=int(airfoil[1])/10    #position of the chamber
-t=int((airfoil[2:]))/10  #thickness
+t=int(airfoil[2:])/100  #thickness
 
 xu=np.zeros(n)
 yu=np.zeros(n)
@@ -47,7 +47,16 @@ yl=yc-yt*np.cos(theta)
 boundary_x=np.concatenate((xu[::-1],xl[1:]))
 boundary_y=np.concatenate((yu[::-1],yl[1:]))
 
-filename=f"NACA{int(m*100)}{int(p*10)}{int(t*100):02d}.dat"
+#plt.figure(figsize=(10,4))
+#plt.plot(boundary_x,boundary_y,label="airfoil surface")
+#plt.plot(x,yc,"--",label="chamber line")
+#plt.grid(True)
+#plt.axis('equal')
+#plt.legend()
+#plt.show()  
+
+
+filename=f"NACA{int(m*100)}{int(p*10)}{int(t*100)}.dat"
 with open(filename,"w") as file:
 	for i in range(len(boundary_x)):
 		file.write(f"{boundary_x[i]:.8f} {boundary_y[i]:.8f}\n")
