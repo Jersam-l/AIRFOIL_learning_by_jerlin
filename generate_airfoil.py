@@ -157,19 +157,19 @@ if alpha_deg !=0:
 #print(arc_x[0], arc_y[0])
 #print(arc_x[-1], arc_y[-1])
 
-plt.figure(figsize=(10,4))
-#plt.plot(outer_boundary_x,outer_boundary_y,label="computationalddomain")
-plt.plot(outer_boundary_x, outer_boundary_y, "--", label="outer boundary")
-plt.plot(airfoil_boundary_x,airfoil_boundary_y,label="airfoil surface") 
-if alpha_deg !=0:
-	plt.plot(camber_rot_x,camber_rot_y,"--",label="chamber line")
-else:
-	plt.plot(x,yc,"--",label="chamber line")
-plt.grid(True)
-plt.axis('equal')
-plt.legend()
-plt.show()  
-exit()
+#plt.figure(figsize=(10,4))
+##plt.plot(outer_boundary_x,outer_boundary_y,label="computationalddomain")
+#plt.plot(outer_boundary_x, outer_boundary_y, "--", label="outer boundary")
+#plt.plot(airfoil_boundary_x,airfoil_boundary_y,label="airfoil surface") 
+#if alpha_deg !=0:
+#	plt.plot(camber_rot_x,camber_rot_y,"--",label="chamber line")
+#else:
+#	plt.plot(x,yc,"--",label="chamber line")
+#plt.grid(True)
+#plt.axis('equal')
+#plt.legend()
+#plt.show()  
+#exit()
 
 filename=f"NACA{int(m*100)}{int(p*10)}{int(t*100)}.dat"
 with open(filename,"w") as file:
