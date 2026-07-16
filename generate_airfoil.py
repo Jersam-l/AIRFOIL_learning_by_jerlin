@@ -8,8 +8,11 @@ if len(airfoil)!=4:
 elif len(airfoil)<4:
 	print("Bruh this is for 4 digit airfoil enter 4 digits only  this is an error .")
 	exit()
-
 chord=(input("Enter the required chord length :"))
+alpha_deg=float(input("Enter the angle of attack (degrees)[Enter 0 for no rotation] :"))
+if alpha_deg !=0:
+	rotation_center=float(input("\nROTATION CENTER\n\t(1)=Quater chord[DEFAULT]\n\t(2)=Leading edge\n\t(3)=Mid chord\n\t(4)=custom\nSELECT AN OPTION :"))
+
 points=(input("Enter the  number of point's needed for the coordinates (whole number) :"))
 print("EXTERNAL DOMAIN TYPE\n	(1)=External Aerodynamics[DEFAULT]\n	(2)=Wind Tunnel\n	(3)=custom Domain")
 domain_type=int(input("select an option :"))
@@ -37,9 +40,31 @@ else:
 print("DOMAIN SHAPE\n	(1)=Rectangle[Default]\n	(2)=C-Domain[semi-circular inlet]\n")
 #print("	(3)=O-Domain[Circular farfield]\n       (4)=[Custom Domain]")
 domain_shape=int(input("Select an option:"))
-
+alpha=np.deg2rad(-alpha_deg)
+pivot_x=0
+pivot_y=0
 c=float(chord) #chord length
 n=int(points) #number of points
+
+
+if alpha_deg!=0:
+	if rotation_center==1:
+		pivot_x=0.25*c
+		pivot_y=0
+	elif rotation_center==2:
+		pivot_x=0
+		pivot_y=0
+	elif rotation_center==3:
+		pivot_x=0.5*c
+		pivot_y=0
+	elif rotation_center==4:
+		pivot_x=float(input("Enter pivot x :"))
+		pivot_y=float(input("Enter pivot y :"))
+	else:
+		print("Invalid rotation center so continueing with the Quater chord !")
+		pivot_x=0.25*c
+		pivot_y=0
+
 # x coordinate
 x=np.linspace(0,c,n)
 m=int(airfoil[0])/100   #chamber
@@ -110,20 +135,36 @@ else:
 #foil
 airfoil_boundary_x=np.concatenate((xu[::-1],xl[1:]))
 airfoil_boundary_y=np.concatenate((yu[::-1],yl[1:]))
+if alpha_deg !=0:
+	x_local=airfoil_boundary_x-pivot_x
+	y_local=airfoil_boundary_y-pivot_y
+	x_rotate=(x_local*np.cos(alpha)-y_local*np.sin(alpha))
+	y_rotate=(x_local*np.sin(alpha)+y_local*np.cos(alpha))
+	airfoil_boundary_x=x_rotate+pivot_x
+	airfoil_boundary_y=y_rotate+pivot_y
+#camber
+	camber_local_x=x-pivot_x
+	camber_local_y=yc-pivot_y
+	camber_rot_x=(camber_local_x*np.cos(alpha)-camber_local_y*np.sin(alpha))
+	camber_rot_y=(camber_local_x*np.sin(alpha)+camber_local_y*np.cos(alpha))
+	camber_rot_x+=pivot_x
+	camber_rot_y+=pivot_y
 
+#print(left)
+#print(top)
+#print(bottom)
 
-print(left)
-print(top)
-print(bottom)
-
-print(arc_x[0], arc_y[0])
-print(arc_x[-1], arc_y[-1])
+#print(arc_x[0], arc_y[0])
+#print(arc_x[-1], arc_y[-1])
 
 plt.figure(figsize=(10,4))
 #plt.plot(outer_boundary_x,outer_boundary_y,label="computationalddomain")
-plt.plot(outer_boundary_x, outer_boundary_y, "-o", markersize=2)
+plt.plot(outer_boundary_x, outer_boundary_y, "--", label="outer boundary")
 plt.plot(airfoil_boundary_x,airfoil_boundary_y,label="airfoil surface") 
-plt.plot(x,yc,"--",label="chamber line")
+if alpha_deg !=0:
+	plt.plot(camber_rot_x,camber_rot_y,"--",label="chamber line")
+else:
+	plt.plot(x,yc,"--",label="chamber line")
 plt.grid(True)
 plt.axis('equal')
 plt.legend()
@@ -132,5 +173,5 @@ exit()
 
 filename=f"NACA{int(m*100)}{int(p*10)}{int(t*100)}.dat"
 with open(filename,"w") as file:
-	for i in range(len(boundary_x)):
-		file.write(f"{boundary_x[i]:.8f} {boundary_y[i]:.8f}\n")
+	for i in range(len(airfoil_boundary_x)):
+		file.write(f"{airfoil_boundary_x[i]:.8f} {airfoil_boundary_y[i]:.8f}\n")
