@@ -11,7 +11,7 @@ elif len(airfoil)<4:
 
 chord=(input("Enter the required chord length :"))
 points=(input("Enter the  number of point's needed for the coordinates (whole number) :"))
-print("EXTERNAL DOMAIN TYPE\n	(1) External Aerodynamics[DEFAULT]\n	(2) Wind Tunnel\n	(3) custom Domain")
+print("EXTERNAL DOMAIN TYPE\n	(1)=External Aerodynamics[DEFAULT]\n	(2)=Wind Tunnel\n	(3)=custom Domain")
 domain_type=int(input("select an option :"))
 
 if domain_type==1:
@@ -22,9 +22,9 @@ if domain_type==1:
 	bottom_distance=10
 elif domain_type==2:
 	print("Wind Tunnel domain selected")
-	blockage= float(input("Enter the required blockage ratio (%) :"))/100
-	upstream=float(input("Enter the upstream distance [x chord length] (REC:5):"))
-	downstream=float(input("enter the down stream distance [x chord length] (REC:15 or 10):"))
+	blockage= float(input("Enter the required blockage ratio (%) [recomended=3 or 5] :"))/100
+	upstream=float(input("Enter the upstream distance [x chord length] (recomended:5):"))
+	downstream=float(input("enter the down stream distance [x chord length] (recomended:6 or 10):"))
 elif domain_type==3:
 	print("Custom domain selected")
 	upstream=float(input("enter upstream distance[x chord] :"))
@@ -34,6 +34,9 @@ elif domain_type==3:
 else:
 	print("Invalid option selected ")
 	exit()
+print("DOMAIN SHAPE\n	(1)=Rectangle[Default]\n	(2)=C-Domain[semi-circular inlet]\n")
+#print("	(3)=O-Domain[Circular farfield]\n       (4)=[Custom Domain]")
+domain_shape=int(input("Select an option:"))
 
 c=float(chord) #chord length
 n=int(points) #number of points
@@ -76,20 +79,50 @@ max_thickness=np.max(yu-yl)
 if domain_type==2:
 	tunnel_height=max_thickness/blockage
 	top=tunnel_height/2
-	bottom=tunnel_height/2
+	bottom=-tunnel_height/2
 else:
 	top=top_distance*c
 	bottom=-bottom_distance*c
+top_x=np.linspace(left,right,200)
+top_y=np.full(200,top)
+right_x=np.full(200,right)
+right_y=np.linspace(top,bottom,200)
+bottom_x=np.linspace(right,left,200)
+bottom_y=np.full(200,bottom)
 
-boundary_x=np.concatenate((xu[::-1],xl[1:]))
-boundary_y=np.concatenate((yu[::-1],yl[1:]))
+if domain_shape==1:
+	outer_boundary_x=np.array([left, right, right, left, left])
+	outer_boundary_y=np.array([bottom, bottom, top, top, bottom])
+elif domain_shape==2:
+	degrees=np.linspace(270,90,500)
+	theta_arc=np.deg2rad(degrees)
+	arc_x=left+top*np.cos(theta_arc)
+	arc_y=top*np.sin(theta_arc)
+	outer_boundary_x=np.concatenate((top_x,right_x[1:],bottom_x[1:],arc_x[1:]))
+	outer_boundary_y=np.concatenate((top_y,right_y[1:],bottom_y[1:],arc_y[1:]))
+#elif domain_shape==3:
+        #0-domain
+#elif domain_shape==4:
+        #custom domain
+else:
+        print("error:invalid input")
+        exit()
+#foil
+airfoil_boundary_x=np.concatenate((xu[::-1],xl[1:]))
+airfoil_boundary_y=np.concatenate((yu[::-1],yl[1:]))
 
-domain_x=[left, right, right, left, left]
-domain_y=[bottom, bottom, top, top, bottom]
+
+print(left)
+print(top)
+print(bottom)
+
+print(arc_x[0], arc_y[0])
+print(arc_x[-1], arc_y[-1])
 
 plt.figure(figsize=(10,4))
-plt.plot(domain_x,domain_y,label="computationalddomain")
-plt.plot(boundary_x,boundary_y,label="airfoil surface")
+#plt.plot(outer_boundary_x,outer_boundary_y,label="computationalddomain")
+plt.plot(outer_boundary_x, outer_boundary_y, "-o", markersize=2)
+plt.plot(airfoil_boundary_x,airfoil_boundary_y,label="airfoil surface") 
 plt.plot(x,yc,"--",label="chamber line")
 plt.grid(True)
 plt.axis('equal')
